@@ -1,0 +1,105 @@
+{% extends 'products/base.html' %}
+
+{% block title %}{{ product.name }} - Details{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Product Title -->
+    <h2 class="text-center">{{ product.name }}</h2>
+    <p class="text-muted text-center">Price: Ksh {{ product.price }}</p>
+
+    <!-- Images -->
+    <div class="d-flex justify-content-center gap-3 mb-4 flex-wrap">
+        {% if product.image1 %}
+            <a href="{{ product.image1.url }}" target="_blank">
+                <img src="{{ product.image1.url }}" alt="{{ product.name }}"
+                     style="height: 200px; width: 200px; object-fit: cover; border-radius: 10px; transition: transform 0.2s;"
+                     onmouseover="this.style.transform='scale(1.05)';"
+                     onmouseout="this.style.transform='scale(1)'">
+            </a>
+        {% endif %}
+        {% if product.image2 %}
+            <a href="{{ product.image2.url }}" target="_blank">
+                <img src="{{ product.image2.url }}" alt="{{ product.name }}"
+                     style="height: 200px; width: 200px; object-fit: cover; border-radius: 10px; transition: transform 0.2s;"
+                     onmouseover="this.style.transform='scale(1.05)';"
+                     onmouseout="this.style.transform='scale(1)'">
+            </a>
+        {% endif %}
+    </div>
+
+    <!-- Product Info -->
+    <div class="mb-4 text-center">
+        {% if product.description %}
+            <p><strong>Description:</strong> {{ product.description }}</p>
+        {% endif %}
+        <p><strong>Quantity:</strong> {{ product.quantity }}</p>
+        <p><strong>Brand:</strong> {{ product.brand.name }}</p>
+        <p><strong>Category:</strong> {{ product.category.name }}</p>
+    </div>
+
+    <!-- Add to Cart Button -->
+    <form method="POST" action="{% url 'add_to_cart' product.id %}" class="text-center mb-4">
+        {% csrf_token %}
+        <button class="btn btn-success" type="submit">Add to Cart</button>
+    </form>
+
+    <!-- In your template -->
+{% if messages %}
+    <div class="text-center mt-2">
+        {% for message in messages %}
+            <p class="{% if 'error' in message.tags %}text-red{% else %}text-green{% endif %} font-bold">
+                {{ message }}
+            </p>
+        {% endfor %}
+    </div>
+{% endif %}
+
+
+    <!-- Reviews -->
+    <hr>
+    <h4 class="text-center">Customer Reviews</h4>
+
+    {% if reviews %}
+        {% for review in reviews %}
+            <div class="border p-3 mb-2 rounded">
+                <strong>{{ review.user.username }}</strong>
+              <span class="text-warning">
+    {% for i in review.rating|add:""|make_list %}
+        ⭐
+    {% endfor %}
+</span>
+
+                <p class="mb-1">{{ review.comment }}</p>
+                <small class="text-muted">{{ review.created_at|date:"F d, Y" }}</small>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="text-muted text-center">No reviews yet.</p>
+    {% endif %}
+
+    <!-- Leave a Review -->
+    {% if can_review %}
+        <hr>
+        <h5 class="text-center">Leave a Review</h5>
+        <form method="post" class="border p-3 rounded mb-4">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary">Submit Review</button>
+            </div>
+        </form>
+    {% elif user.is_authenticated %}
+        <p class="text-center text-muted"><em>You’ve already reviewed this product or haven’t purchased it yet.</em></p>
+    {% else %}
+        <p class="text-center text-muted">
+            <a href="{% url 'login' %}">Log in</a> to leave a review.
+        </p>
+    {% endif %}
+
+    <!-- Back Button -->
+    <div class="text-center mt-4">
+        <a class="btn btn-outline-secondary" href="{% url 'home' %}">← Back to Home</a>
+    </div>
+</div>
+{% endblock %}

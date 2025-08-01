@@ -1,0 +1,126 @@
+{% extends 'products/base.html' %}
+{% load static %}
+
+{% block title %}Home - EchoStore{% endblock %}
+
+{% block content %}
+
+
+<!-- 🎯 Hero Section -->
+<style>
+    .hero-image {
+        animation: floatImage 4s ease-in-out infinite;
+        max-width: 100%;
+        height: auto;
+    }
+
+    @keyframes floatImage {
+        0% { transform: translateY(0); }
+        50% { transform: translateY(-12px); }
+        100% { transform: translateY(0); }
+    }
+</style>
+
+<div class="p-5 mb-5 rounded-4" style="background: linear-gradient(to right, #2E86C1, #6C3483); color: white;">
+    <div class="container-fluid py-5">
+        <div class="row align-items-center">
+            <div class="col-md-6 mb-4 mb-md-0">
+                <h1 class="display-5 fw-bold">Welcome to All Item Store</h1>
+                <p class="fs-5">Find everything you need in one place.</p>
+                <a class="btn btn-warning btn-lg mt-3" href="{% url 'shop' %}">Shop Now</a>
+            </div>
+
+            <div class="col-md-6 text-center">
+                <img src="{% static 'products/images/shoppers.png' %}" 
+                     alt="Shoppers" 
+                     class="hero-image"
+                     style="max-height: 350px; border-radius: 20px; box-shadow: 0 4px 18px rgba(0,0,0,0.3);">
+            </div>
+        </div>
+    </div>
+</div> 
+
+<!-- ⭐ Featured Products (Static) -->
+<h2 class="mb-4 text-center">Featured Products</h2>
+<div class="row gx-3 gy-4 mb-5 text-center">
+    <div class="col-md-4">
+        <div class="card shadow-sm p-3 h-100 border-0 rounded-4">
+            <img src="{% static 'products/images/headphones.png' %}" alt="Headphones" class="img-fluid mb-3 rounded-3" style="height: 180px; object-fit: cover;">
+            <h5>Wireless Headphones</h5>
+            <p class="text-muted">Ksh 4,990</p>
+            <form method="POST" action="{% url 'add_to_cart' 1 %}">
+                {% csrf_token %}
+                <button class="btn btn-outline-success btn-sm">Add to Cart</button>
+            </form>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm p-3 h-100 border-0 rounded-4">
+            <img src="{% static 'products/images/sneakers.png' %}" alt="Sneakers" class="img-fluid mb-3 rounded-3" style="height: 180px; object-fit: cover;">
+            <h5>Sneakers</h5>
+            <p class="text-muted">Ksh 5,990</p>
+            <form method="POST" action="{% url 'add_to_cart' 2 %}">
+                {% csrf_token %}
+                <button class="btn btn-outline-success btn-sm">Add to Cart</button>
+            </form>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm p-3 h-100 border-0 rounded-4">
+            <img src="{% static 'products/images/fridge.png' %}" alt="Mini Fridge" class="img-fluid mb-3 rounded-3" style="height: 180px; object-fit: cover;">
+            <h5>Mini Fridge</h5>
+            <p class="text-muted">Ksh 9,999</p>
+            <form method="POST" action="{% url 'add_to_cart' 3 %}">
+                {% csrf_token %}
+                <button class="btn btn-outline-success btn-sm">Add to Cart</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="row gx-3 gy-4 mb-5 text-center">
+    
+</div>
+
+
+<!-- 🛍 All Products -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0 text-center">All Products</h2>
+    <form method="get" class="d-flex" style="width: 250px;">
+        <select name="sort" class="form-select" onchange="this.form.submit()">
+            <option value="">Sort by Price</option>
+            <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>Low to High</option>
+            <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>High to Low</option>
+        </select>
+    </form>
+</div>
+
+<div class="row gx-3 gy-4">
+    {% for product in products %}
+    <div class="col-md-4 d-flex align-items-stretch">
+        <div class="card h-100 text-center shadow-sm p-3 border-0 rounded-4">
+            <h5 class="card-title mb-2">{{ product.name }}</h5>
+            <p class="text-muted mb-2">Ksh {{ product.price }}</p>
+            <div class="d-flex justify-content-center gap-2 mb-3">
+                {% if product.image1 %}
+                    <a href="{% url 'product_detail' product.id %}">
+                        <img src="{{ product.image1.url }}" alt="{{ product.name }}" style="height: 100px; width: 100px; object-fit: cover; border-radius: 8px;">
+                    </a>
+                {% endif %}
+                {% if product.image2 %}
+                    <a href="{% url 'product_detail' product.id %}">
+                        <img src="{{ product.image2.url }}" alt="{{ product.name }}" style="height: 100px; width: 100px; object-fit: cover; border-radius: 8px;">
+                    </a>
+                {% endif %}
+            </div>
+            <form method="POST" action="{% url 'add_to_cart' product.id %}">
+                {% csrf_token %}
+                <button class="btn btn-success btn-sm px-3 rounded-pill">Add to Cart</button>
+            </form>
+        </div>
+    </div>
+    {% empty %}
+        <p>No products available.</p>
+    {% endfor %}
+</div>
+{% endblock %}

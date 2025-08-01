@@ -1,0 +1,100 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Profile</title>
+
+    <!-- Optional Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(to right, #f3e9ff, #e6f0ff);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .profile-container {
+            max-width: 600px;
+            margin: 60px auto;
+            padding: 40px;
+            background-color: #fff;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .profile-header h2 {
+            font-weight: 700;
+            font-size: 26px;
+            color: #6a0dad;
+        }
+
+        .profile-header p {
+            font-size: 15px;
+            color: #888;
+        }
+
+        .profile-info p {
+            font-size: 16px;
+            margin: 12px 0;
+            padding-left: 8px;
+        }
+
+        .profile-info strong {
+            display: inline-block;
+            width: 120px;
+            color: #333;
+        }
+
+        .profile-icon {
+            color: #6c63ff;
+            margin-right: 10px;
+        }
+
+        .line {
+            border-bottom: 1px solid #eee;
+            margin: 8px 0 16px;
+        }
+
+        @media (max-width: 600px) {
+            .profile-container {
+                padding: 25px;
+            }
+
+            .profile-info strong {
+                width: auto;
+                display: block;
+                margin-bottom: 3px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <div class="profile-header">
+            <h2>👋 Hi, {{ user.first_name }}!</h2>
+            <p>Here’s your account information</p>
+        </div>
+
+        <div class="profile-info">
+            <p><span class="profile-icon">👤</span><strong>First Name:</strong> {{ user.first_name }}</p>
+            <div class="line"></div>
+            <p><span class="profile-icon">👥</span><strong>Last Name:</strong> {{ user.last_name }}</p>
+            <div class="line"></div>
+            <p><span class="profile-icon">📧</span><strong>Email:</strong> {{ user.email }}</p>
+            <div class="line"></div>
+            <p><span class="profile-icon">📱</span><strong>Phone:</strong> {{ user.phone }}</p>
+            <div class="line"></div>
+            <p><span class="profile-icon">🔐</span><strong>Username:</strong> {{ user.username }}</p>
+        </div>
+    </div>
+</body>
+</html>

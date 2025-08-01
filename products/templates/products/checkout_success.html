@@ -1,0 +1,43 @@
+{% extends 'products/base.html' %}
+{% block title %}Order Placed - EchoStore{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-success text-center mb-4">🎉 Order Placed Successfully!</h2>
+
+    <p class="text-center fs-5">Thank you for your purchase. Your order details are shown below:</p>
+
+    <h4 class="mt-5 mb-3">🧾 Order Summary</h4>
+
+    <table class="table table-bordered text-center align-middle shadow-sm">
+        <thead class="table-light">
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price (Each)</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order_items %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>Ksh {{ item.price|floatformat:2 }}</td>
+                    <td>Ksh {{ item.subtotal|floatformat:2 }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="text-end me-2">
+        <h4><strong>Total Paid: Ksh {{ order.total_price|floatformat:2 }}</strong></h4>
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="{% url 'home' %}" class="btn btn-outline-primary rounded-pill px-4 py-2 shadow-sm">
+            🛍 Return to Shop
+        </a>
+    </div>
+</div>
+{% endblock %}
