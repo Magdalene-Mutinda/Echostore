@@ -44,17 +44,16 @@
         <button class="btn btn-success" type="submit">Add to Cart</button>
     </form>
 
-    <!-- In your template -->
-{% if messages %}
-    <div class="text-center mt-2">
-        {% for message in messages %}
-            <p class="{% if 'error' in message.tags %}text-red{% else %}text-green{% endif %} font-bold">
-                {{ message }}
-            </p>
-        {% endfor %}
-    </div>
-{% endif %}
-
+    <!-- Display Messages -->
+    {% if messages %}
+        <div class="text-center mt-2">
+            {% for message in messages %}
+                <p class="{% if 'error' in message.tags %}text-danger{% else %}text-success{% endif %} fw-bold">
+                    {{ message }}
+                </p>
+            {% endfor %}
+        </div>
+    {% endif %}
 
     <!-- Reviews -->
     <hr>
@@ -63,13 +62,19 @@
     {% if reviews %}
         {% for review in reviews %}
             <div class="border p-3 mb-2 rounded">
-                <strong>{{ review.user.username }}</strong>
-              <span class="text-warning">
-    {% for i in review.rating|add:""|make_list %}
-        ⭐
-    {% endfor %}
-</span>
-
+                <div class="d-flex justify-content-between align-items-center">
+                    <strong>{{ review.user.username }}</strong>
+                    <span class="text-warning">
+                        {% for i in "12345"|make_list %}
+                            {% if forloop.counter <= review.rating %}
+                                &#9733;
+                            {% else %}
+                                <span style="color: lightgray;">&#9733;</span>
+                            {% endif %}
+                        {% endfor %}
+                        ({{ review.rating }}/5)
+                    </span>
+                </div>
                 <p class="mb-1">{{ review.comment }}</p>
                 <small class="text-muted">{{ review.created_at|date:"F d, Y" }}</small>
             </div>
@@ -77,6 +82,22 @@
     {% else %}
         <p class="text-muted text-center">No reviews yet.</p>
     {% endif %}
+
+<!-- Average Star Rating Summary -->
+    <div class="text-center mb-3">
+        <div class="d-inline-block">
+            {% with avg=average_rating|floatformat:0 %}
+                {% for i in "12345"|make_list %}
+                    {% if forloop.counter <= avg %}
+                        <span style="color: gold;">&#9733;</span>
+                    {% else %}
+                        <span style="color: lightgray;">&#9733;</span>
+                    {% endif %}
+                {% endfor %}
+                <span class="text-muted">({{ total_reviews }} verified ratings)</span>
+            {% endwith %}
+        </div>
+    </div>
 
     <!-- Leave a Review -->
     {% if can_review %}

@@ -30,6 +30,7 @@ class Brand(models.Model):
     def __str__(self):
         return self.name
 
+from django.db.models import Avg
 
 class Product(models.Model):
     name = models.CharField(max_length=200)
@@ -45,6 +46,16 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+    # ⭐️ Helper method to get average rating
+    def average_rating(self):
+        avg = self.reviews.aggregate(Avg('rating'))['rating__avg']
+        return round(avg or 0, 1)
+
+    # ⭐️ Helper method to get total number of reviews
+    def total_reviews(self):
+        return self.reviews.count()
+
 
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

@@ -193,12 +193,18 @@ def category_products(request, category_id):
     })
 
 
+from django.contrib import messages
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Product, OrderItem
+from .forms import ReviewForm
+
 def product_detail(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     reviews = product.reviews.all().order_by('-created_at')
 
     has_ordered = False
     can_review = False
+    has_reviewed = False
 
     if request.user.is_authenticated:
         has_ordered = OrderItem.objects.filter(order__user=request.user, product=product).exists()
@@ -219,11 +225,17 @@ def product_detail(request, product_id):
     else:
         form = None
 
+    # ⭐ Add these two variables to use in template
+    average_rating = product.average_rating()
+    total_reviews = product.total_reviews()
+
     return render(request, 'products/product_detail.html', {
         'product': product,
         'reviews': reviews,
         'form': form,
-        'can_review': can_review
+        'can_review': can_review,
+        'average_rating': average_rating,
+        'total_reviews': total_reviews,
     })
 
 
