@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.utils.text import slugify
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
+from django.db.models import Avg
 
 def validate_image(file):
     valid_extensions = ['jpg', 'jpeg', 'png']
@@ -29,8 +29,6 @@ class Brand(models.Model):
 
     def __str__(self):
         return self.name
-
-from django.db.models import Avg
 
 class Product(models.Model):
     name = models.CharField(max_length=200)
