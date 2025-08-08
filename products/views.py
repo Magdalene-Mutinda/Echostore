@@ -23,6 +23,7 @@ import openpyxl
 from django.shortcuts import render, redirect
 from .forms import ExcelUploadForm
 from .models import Product, Category, Brand
+from .models import UserProfile
 
 def import_products(request):
     if request.method == 'POST':
@@ -75,6 +76,11 @@ def categories_processor(request):
     return {'categories': categories}
 
 # =================== AUTH ===================
+from django.contrib.auth import login
+from django.shortcuts import render, redirect
+from .forms import CustomLoginForm
+from .models import UserProfile
+
 def custom_login(request):
     if request.method == 'POST':
         form = CustomLoginForm(request, data=request.POST)
@@ -87,6 +93,7 @@ def custom_login(request):
             return redirect('home')
     else:
         form = CustomLoginForm()
+        
     return render(request, 'products/registration/login.html', {'form': form})
 
 

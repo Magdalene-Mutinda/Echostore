@@ -75,7 +75,7 @@
 
 <div class="login-container">
     <h2>Login</h2>
-    <form method="post">
+    <form method="post" action="{% url 'custom_login' %}">
         {% csrf_token %}
         <label for="id_username">Username:</label>
         {{ form.username }}
