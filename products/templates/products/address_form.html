@@ -1,7 +1,0 @@
-<h3>{% if form.instance.pk %}Edit Address{% else %}Add New Address{% endif %}</h3>
-
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-success">Save</button>
-</form>

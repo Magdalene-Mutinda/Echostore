@@ -1,0 +1,139 @@
+{% extends 'products/base.html' %}
+{% block title %}My Addresses{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h4 class="mb-3">My Addresses</h4>
+
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    <!-- Existing Addresses -->
+    <div class="row">
+        {% for addr in addresses %}
+        <div class="col-md-6">
+            <div class="card mb-3 {% if addr.is_default %}border-primary{% endif %}">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="mb-1">{{ addr.first_name }} {{ addr.last_name }}</h6>
+                            <p class="mb-1 small">{{ addr.address }}</p>
+                            <p class="mb-1 small">{{ addr.city.name }}, {{ addr.region.name }}</p>
+                            <p class="mb-1 small">Phone: {{ addr.phone_number }}{% if addr.additional_phone %} / {{ addr.additional_phone }}{% endif %}</p>
+                        </div>
+                        <div class="text-end">
+                            {% if addr.is_default %}
+                                <span class="badge bg-primary mb-2">Default</span>
+                            {% else %}
+                                <form method="post" action="{% url 'set_default_address' addr.id %}">
+                                    {% csrf_token %}
+                                    <button class="btn btn-outline-primary btn-sm mb-2">Set as Default</button>
+                                </form>
+                            {% endif %}
+                            <form method="post" action="{% url 'delete_address' addr.id %}" onsubmit="return confirm('Delete this address?');">
+                                {% csrf_token %}
+                                <button class="btn btn-outline-danger btn-sm">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <p>No addresses yet.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <hr>
+
+    <h5 class="mt-4">Add New Address</h5>
+    <p class="text-muted small">You can add up to {{ max_addresses|default:2 }} addresses.</p>
+
+    <form method="post" id="addressForm">
+        {% csrf_token %}
+        <div class="row g-3 align-items-start">
+            <!-- First & Last (read-only from profile/user) -->
+            <div class="col-md-6">
+                <label class="form-label">First name</label>
+                <input type="text" class="form-control" value="{{ request.user.first_name }}" readonly>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Last name</label>
+                <input type="text" class="form-control" value="{{ request.user.last_name }}" readonly>
+            </div>
+
+            <!-- Phone (from profile) and additional phone input -->
+            <div class="col-md-6">
+                <label class="form-label">Phone number</label>
+                <input type="text" class="form-control" value="{% if request.user.profile.phone_number %}{{ request.user.profile.phone_number }}{% endif %}" readonly>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Additional phone</label>
+                {{ form.additional_phone }}
+            </div>
+
+            <!-- Address and additional info -->
+            <div class="col-12">
+                <label class="form-label">Address</label>
+                {{ form.address }}
+            </div>
+            <div class="col-12">
+                <label class="form-label">Additional information</label>
+                {{ form.additional_info }}
+            </div>
+
+            <!-- Region and City pair -->
+            <div class="col-md-6">
+                <label class="form-label">Region</label>
+                {{ form.region }}
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">City</label>
+                {{ form.city }}
+            </div>
+
+            <div class="col-12 mt-2">
+                <button type="submit" class="btn btn-primary">Save Address</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    const regionSelect = document.getElementById('id_region');
+    const citySelect = document.getElementById('id_city');
+
+    if(regionSelect){
+        regionSelect.addEventListener('change', function(){
+            const regionId = this.value;
+            if(!regionId){
+                citySelect.innerHTML = '<option value="">Select region first</option>';
+                return;
+            }
+            fetch("{% url 'ajax_get_cities' 0 %}".replace('0', regionId))
+                .then(res => res.json())
+                .then(data => {
+                    citySelect.innerHTML = '';
+                    if(data.length === 0){
+                        citySelect.innerHTML = '<option value="">No cities available</option>';
+                    } else {
+                        data.forEach(function(c){
+                            const opt = document.createElement('option');
+                            opt.value = c.id;
+                            opt.textContent = c.name;
+                            citySelect.appendChild(opt);
+                        });
+                    }
+                })
+                .catch(err => {
+                    console.error('Error fetching cities', err);
+                });
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -6,6 +6,47 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db.models import Avg
 
+
+class Region(models.Model):
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+class City(models.Model):
+    region = models.ForeignKey(Region, on_delete=models.CASCADE, related_name="cities")
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return f"{self.name} ({self.region.name})"
+
+class Address(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="addresses")
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    phone_number = models.CharField(max_length=20)
+    additional_phone = models.CharField(max_length=20, blank=True, null=True)
+    address = models.TextField()
+    additional_info = models.TextField(blank=True, null=True)
+    region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True)
+    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True)
+    is_default = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-is_default', '-created_at']
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name} — {self.address}"
+
+
+
 def validate_image(file):
     valid_extensions = ['jpg', 'jpeg', 'png']
     ext = file.name.split('.')[-1].lower()

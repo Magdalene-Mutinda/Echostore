@@ -5,6 +5,21 @@ from .models import Review
 from django import forms
 from .models import Review
 
+from .models import Address, Region, City
+
+class AddressForm(forms.ModelForm):
+    class Meta:
+        model = Address
+        fields = ['additional_phone', 'address', 'additional_info', 'region', 'city']
+        widgets = {
+            'address': forms.Textarea(attrs={'rows': 2, 'class': 'form-control', 'placeholder': 'e.g. House number, Street, Estate'}),
+            'additional_info': forms.Textarea(attrs={'rows': 2, 'class': 'form-control', 'placeholder': 'e.g. Landmark, instructions (optional)'}),
+            'additional_phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Additional phone (optional)'}),
+            'region': forms.Select(attrs={'class': 'form-select'}),
+            'city': forms.Select(attrs={'class': 'form-select'}),
+        }
+
+
 class ReviewForm(forms.ModelForm):
     RATING_CHOICES = [
         (1, '⭐'),

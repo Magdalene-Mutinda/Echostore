@@ -24,6 +24,86 @@ from django.shortcuts import render, redirect
 from .forms import ExcelUploadForm
 from .models import Product, Category, Brand
 from .models import UserProfile
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse, HttpResponseForbidden
+from django.contrib.auth.decorators import login_required
+from .forms import AddressForm
+from .models import Address, City, Region
+from django.views.decorators.http import require_POST
+
+@login_required
+def manage_addresses(request):
+    user = request.user
+    addresses = Address.objects.filter(user=user).order_by('-is_default','-created_at')
+    max_addresses = 2
+
+    if request.method == 'POST':
+        # adding a new address
+        if addresses.count() >= max_addresses:
+            form = AddressForm()  # empty form so page still renders
+            error = f"You can only add up to {max_addresses} addresses."
+            return render(request, 'products/manage_addresses.html', {
+                'addresses': addresses, 'form': form, 'error': error
+            })
+
+        form = AddressForm(request.POST)
+        if form.is_valid():
+            addr = form.save(commit=False)
+            addr.user = user
+            # fetch first/last/phone from profile or user fields
+            addr.first_name = getattr(user, 'first_name', '') or ''
+            addr.last_name = getattr(user, 'last_name', '') or ''
+            # assume you have a Profile model with phone_number; fallback to empty string
+            phone = ''
+            try:
+                phone = user.profile.phone_number or ''
+            except Exception:
+                phone = ''
+            addr.phone_number = phone
+            # if this is the first address, make default
+            if not addresses.exists():
+                addr.is_default = True
+            addr.save()
+            return redirect('manage_addresses')
+    else:
+        form = AddressForm()
+
+    return render(request, 'products/manage_addresses.html', {
+        'addresses': addresses,
+        'form': form,
+        'max_addresses': max_addresses
+    })
+
+@login_required
+@require_POST
+def set_default_address(request, address_id):
+    addr = get_object_or_404(Address, id=address_id, user=request.user)
+    # unset other defaults
+    Address.objects.filter(user=request.user, is_default=True).update(is_default=False)
+    addr.is_default = True
+    addr.save()
+    return redirect('manage_addresses')
+
+@login_required
+@require_POST
+def delete_address(request, address_id):
+    addr = get_object_or_404(Address, id=address_id, user=request.user)
+    was_default = addr.is_default
+    addr.delete()
+    # if deleted address was default and there is another address, set one as default
+    if was_default:
+        other = Address.objects.filter(user=request.user).first()
+        if other:
+            other.is_default = True
+            other.save()
+    return redirect('manage_addresses')
+
+@login_required
+def get_cities(request, region_id):
+    # returns JSON list of cities for a region
+    cities = City.objects.filter(region_id=region_id).order_by('name').values('id','name')
+    return JsonResponse(list(cities), safe=False)
+
 
 def import_products(request):
     if request.method == 'POST':

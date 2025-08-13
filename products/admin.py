@@ -2,12 +2,11 @@ from django.contrib import admin
 from django.utils.html import format_html
 from .models import Product, Category, Review, Cart, CartItem, Order, OrderItem, Brand
 
-# Inline product form inside Category admin
+# --- Existing Admins ---
 class ProductInline(admin.TabularInline):
     model = Product
     extra = 5
 
-# Category Admin
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('name', 'image_tag')
     inlines = [ProductInline]
@@ -18,23 +17,30 @@ class CategoryAdmin(admin.ModelAdmin):
         return "No Image"
     image_tag.short_description = 'Image'
 
-# Product Admin
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'price', 'category', 'is_featured')
     list_filter = ('category', 'is_featured')
     search_fields = ('name',)
     list_editable = ('is_featured',)
-    # Removed ProductImageInline inlines
 
-# Brand Admin
 class BrandAdmin(admin.ModelAdmin):
     list_display = ('name',)
 
-# Register all models (removed ProductImage)
+# ✅ --- FIXED: Custom Review Admin ---
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ('user', 'product', 'display_star_rating', 'comment', 'created_at')
+
+    @admin.display(description='Rating')
+    def display_star_rating(self, obj):
+        filled = '★' * obj.rating
+        empty = '☆' * (5 - obj.rating)
+        return format_html('<span style="color: orange;">{}{}</span>', filled, empty)
+
+# --- Registering all Admins ---
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Brand, BrandAdmin)
-admin.site.register(Review)
+admin.site.register(Review, ReviewAdmin)  # ✅ Use custom ReviewAdmin
 admin.site.register(Cart)
 admin.site.register(CartItem)
 admin.site.register(Order)

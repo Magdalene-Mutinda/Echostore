@@ -133,17 +133,18 @@
                         Hi, {{ user.first_name|default:user.username }}
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="{% url 'profile' %}">My Account</a></li>
-                        <li><a class="dropdown-item" href="{% url 'my_orders' %}">My Orders</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <form method="POST" action="{% url 'logout' %}" class="px-3">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-link p-0 text-danger">Logout</button>
-                            </form>
-                        </li>
-                    </ul>
-                </div>
+    <li><a class="dropdown-item" href="{% url 'profile' %}">My Account</a></li>
+    <li><a class="dropdown-item" href="{% url 'my_orders' %}">My Orders</a></li>
+    <li><a class="dropdown-item" href="{% url 'manage_addresses' %}">My Addresses</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li>
+        <form method="POST" action="{% url 'logout' %}" class="px-3">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-link p-0 text-danger">Logout</button>
+        </form>
+    </li>
+</ul>
+
                 <a href="{% url 'cart' %}" class="nav-link fs-5">🛒Cart</a>
             {% else %}
                 <a href="{% url 'login' %}" class="nav-link">Login</a>

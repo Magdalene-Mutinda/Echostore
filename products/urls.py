@@ -39,5 +39,11 @@ urlpatterns = [
     path('my-orders/', views.my_orders, name='my_orders'),
     path('activate/<uidb64>/<token>/', views.activate_account, name='activate'),
     path('shop/', views.all_products, name='shop'),
+
+    #address management
+    path('my-addresses/', views.manage_addresses, name='manage_addresses'),
+    path('set-default-address/<int:address_id>/', views.set_default_address, name='set_default_address'),
+    path('delete-address/<int:address_id>/', views.delete_address, name='delete_address'),
+    path('ajax/get-cities/<int:region_id>/', views.get_cities, name='ajax_get_cities'),
 ]
 
