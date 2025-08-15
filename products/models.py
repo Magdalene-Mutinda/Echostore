@@ -5,6 +5,13 @@ from django.utils.text import slugify
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db.models import Avg
+from django.core.exceptions import ValidationError
+
+def validate_excel_file(file):
+    valid_extensions = ['xlsx', 'xls'] 
+    ext = file.name.split('.')[-1].lower()  
+    if ext not in valid_extensions:
+        raise ValidationError('Only Excel files (.xlsx or .xls) are allowed.')
 
 
 class Region(models.Model):
