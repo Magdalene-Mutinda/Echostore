@@ -95,20 +95,20 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
-    # ⭐️ Average rating
+   
     def average_rating(self):
         avg = self.reviews.aggregate(Avg('rating'))['rating__avg']
         return round(avg or 0, 1)
 
-    # ⭐️ Total reviews
+    
     def total_reviews(self):
         return self.reviews.count()
 
-    # ⭐️ Rating breakdown (5→1 stars)
+    
     def rating_breakdown(self):
         breakdown = {}
         total = self.reviews.count()
-        for i in range(5, 0, -1):  # loop 5 down to 1
+        for i in range(5, 0, -1): 
             count = self.reviews.filter(rating=i).count()
             percentage = (count / total * 100) if total > 0 else 0
             breakdown[i] = {
@@ -193,7 +193,6 @@ class ReviewAdmin(admin.ModelAdmin):
     search_fields = ('product__name', 'user__username', 'comment')
     readonly_fields = ('created_at',)
 
-    # Optional: truncate long comments in the list display
     def short_comment(self, obj):
         return obj.comment[:50] + ('...' if len(obj.comment) > 50 else '')
     short_comment.short_description = 'Comment'

@@ -40,7 +40,7 @@ from .forms import AddressForm
 
 @login_required
 def manage_addresses(request):
-    user = request.user   # ✅ Corrected, no comma
+    user = request.user  
     addresses = Address.objects.filter(user=user).order_by('-is_default', '-created_at')
 
     if request.method == 'POST':
@@ -49,11 +49,10 @@ def manage_addresses(request):
             addr = form.save(commit=False)
             addr.user = user
 
-            # fetch first_name and last_name from User model
             addr.first_name = getattr(user, 'first_name', '') or ''
             addr.last_name = getattr(user, 'last_name', '') or ''
 
-            # fetch phone from Profile model if available
+            
             phone = ''
             try:
                 phone = user.profile.phone_number or ''
@@ -61,7 +60,7 @@ def manage_addresses(request):
                 phone = ''
             addr.phone_number = phone
 
-            # If this is the first address, make it default
+           
             if not addresses.exists():
                 addr.is_default = True
 
@@ -81,10 +80,8 @@ def manage_addresses(request):
 def set_default_address(request, address_id):
     addr = get_object_or_404(Address, id=address_id, user=request.user)
 
-    # unset other defaults
     Address.objects.filter(user=request.user, is_default=True).update(is_default=False)
 
-    # set this as default
     addr.is_default = True
     addr.save()
     return redirect('manage_addresses')
@@ -97,7 +94,7 @@ def delete_address(request, address_id):
     was_default = addr.is_default
     addr.delete()
 
-    # if the deleted one was default, make another one default if exists
+  
     if was_default:
         other = Address.objects.filter(user=request.user).first()
         if other:
@@ -109,7 +106,7 @@ def delete_address(request, address_id):
 
 @login_required
 def get_cities(request, region_id):
-    # returns JSON list of cities for a region
+   
     cities = City.objects.filter(region_id=region_id).order_by('name').values('id','name')
     return JsonResponse(list(cities), safe=False)
 
@@ -159,12 +156,11 @@ def search_results(request):
     })
 
 
-# =================== CATEGORY CONTEXT PROCESSOR ===================
 def categories_processor(request):
     categories = Category.objects.all()
     return {'categories': categories}
 
-# =================== AUTH ===================
+
 from django.contrib.auth import login
 from django.shortcuts import render, redirect
 from .forms import CustomLoginForm
@@ -232,7 +228,6 @@ def activate_account(request, uidb64, token):
         return redirect('signup')
 
 
-# =================== USER ===================
 @login_required
 def profile_view(request):
     return render(request, 'products/profile.html')
@@ -250,7 +245,7 @@ def order_history(request):
     return render(request, 'products/order_history.html', {'orders': orders})
 
 
-# =================== ADMIN ===================
+
 @staff_member_required
 def all_orders(request):
     orders = Order.objects.prefetch_related('orderitem_set__product').order_by('-created_at')
@@ -263,7 +258,7 @@ def admin_dashboard(request):
     return render(request, 'products/admin_dashboard.html', {'reviews': reviews})
 
 
-# =================== PRODUCT & CATEGORIES ===================
+
 def home(request):
     sort = request.GET.get('sort')
     if sort == 'price_asc':
@@ -321,7 +316,7 @@ def product_detail(request, product_id):
     else:
         form = None
 
-    # ⭐ Add these two variables to use in template
+    
     average_rating = product.average_rating()
     total_reviews = product.total_reviews()
 
@@ -336,7 +331,7 @@ def product_detail(request, product_id):
     })
 
 
-# =================== CART ===================
+
 @login_required
 def view_cart(request):
     cart, _ = Cart.objects.get_or_create(user=request.user)

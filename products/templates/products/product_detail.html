@@ -6,18 +6,17 @@
 <div class="container mt-4">
     <div class="row">
 
-        <!-- LEFT COLUMN: Ratings Summary & Breakdown -->
+       
         <div class="col-md-4 mb-4">
             <h4>Customer Ratings</h4>
 
-            <!-- Average rating -->
             <div class="mb-2">
                 <span class="h3">{{ product.average_rating }}</span> / 5
                 <br>
                 <small class="text-muted">{{ product.total_reviews }} verified reviews</small>
             </div>
 
-            <!-- Stars -->
+         
             <div class="mb-3">
                 {% with avg=product.average_rating|floatformat:0 %}
                     {% for i in "12345"|make_list %}
@@ -30,14 +29,13 @@
                 {% endwith %}
             </div>
 
-            <!-- Rating Breakdown (safe version) -->
+            
             <div class="mt-3">
                 {% for star, data in rating_breakdown.items %}
                     {% with width=data.percentage|default:0|floatformat:0 %}
                         <div class="d-flex align-items-center mb-1">
                             <span class="me-2">{{ star }} ⭐</span>
 
-                            <!-- Progress bar -->
                             <div class="progress flex-grow-1 me-2" style="height: 10px;">
                                 <div class="progress-bar bg-warning" role="progressbar"
                                      style="width: {{ data.percentage|default:0 }}%;"
@@ -46,7 +44,7 @@
 
                             </div>
 
-                            <!-- Count -->
+                         
                             <span>{{ data.count|default:0 }}</span>
                         </div>
                     {% endwith %}
@@ -54,13 +52,12 @@
             </div>
         </div>
 
-        <!-- RIGHT COLUMN: Product Info & Images -->
+      
         <div class="col-md-8">
-            <!-- Product Title & Price -->
+           
             <h2>{{ product.name }}</h2>
             <p class="text-muted">Price: Ksh {{ product.price }}</p>
 
-            <!-- Images -->
             <div class="d-flex flex-wrap gap-3 mb-4 justify-content-center">
                 {% if product.image1 %}
                     <a href="{{ product.image1.url }}" target="_blank">
@@ -80,7 +77,6 @@
                 {% endif %}
             </div>
 
-            <!-- Product Info -->
             <div class="mb-4">
                 {% if product.description %}
                     <p><strong>Description:</strong> {{ product.description }}</p>
@@ -90,7 +86,7 @@
                 <p><strong>Category:</strong> {{ product.category.name }}</p>
             </div>
 
-            <!-- Add to Cart Button -->
+     
             <form method="POST" action="{% url 'add_to_cart' product.id %}" class="mb-4">
                 {% csrf_token %}
                 <button class="btn btn-success" type="submit">Add to Cart</button>
@@ -98,7 +94,7 @@
         </div>
     </div>
 
-    <!-- Customer Reviews Section -->
+ 
     <hr>
     <h4 class="text-center mt-4">Customer Reviews</h4>
 
@@ -126,7 +122,7 @@
         <p class="text-muted text-center">No reviews yet.</p>
     {% endif %}
 
-    <!-- Leave a Review -->
+    
     {% if can_review %}
         <hr>
         <h5 class="text-center">Leave a Review</h5>
@@ -145,9 +141,10 @@
         </p>
     {% endif %}
 
-    <!-- Back Button -->
+ 
     <div class="text-center mt-4">
         <a class="btn btn-outline-secondary" href="{% url 'home' %}">← Back to Home</a>
     </div>
-</div>
+</div>  
 {% endblock %}
+   
