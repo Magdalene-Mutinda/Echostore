@@ -332,6 +332,7 @@ def product_detail(request, product_id):
         'can_review': can_review,
         'average_rating': average_rating,
         'total_reviews': total_reviews,
+        'rating_breakdown': product.rating_breakdown(),
     })
 
 

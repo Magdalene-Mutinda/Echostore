@@ -78,6 +78,8 @@ class Brand(models.Model):
     def __str__(self):
         return self.name
 
+from django.db.models import Avg
+
 class Product(models.Model):
     name = models.CharField(max_length=200)
     image1 = models.ImageField(upload_to='product_images/', validators=[validate_image], blank=True, null=True)
@@ -93,14 +95,28 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
-    # ⭐️ Helper method to get average rating
+    # ⭐️ Average rating
     def average_rating(self):
         avg = self.reviews.aggregate(Avg('rating'))['rating__avg']
         return round(avg or 0, 1)
 
-    # ⭐️ Helper method to get total number of reviews
+    # ⭐️ Total reviews
     def total_reviews(self):
         return self.reviews.count()
+
+    # ⭐️ Rating breakdown (5→1 stars)
+    def rating_breakdown(self):
+        breakdown = {}
+        total = self.reviews.count()
+        for i in range(5, 0, -1):  # loop 5 down to 1
+            count = self.reviews.filter(rating=i).count()
+            percentage = (count / total * 100) if total > 0 else 0
+            breakdown[i] = {
+                "count": count,
+                "percentage": round(percentage)
+            }
+        return breakdown
+
 
 
 class Order(models.Model):
@@ -167,3 +183,31 @@ class Review(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.product.name} - {self.rating}⭐"
+
+from django.contrib import admin
+from .models import Product, Review
+
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ('product', 'user', 'rating', 'short_comment', 'created_at')
+    list_filter = ('rating', 'created_at', 'product')
+    search_fields = ('product__name', 'user__username', 'comment')
+    readonly_fields = ('created_at',)
+
+    # Optional: truncate long comments in the list display
+    def short_comment(self, obj):
+        return obj.comment[:50] + ('...' if len(obj.comment) > 50 else '')
+    short_comment.short_description = 'Comment'
+
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ('name', 'category', 'brand', 'price', 'quantity', 'average_rating_display', 'total_reviews')
+    
+    def average_rating_display(self, obj):
+        return obj.average_rating()
+    average_rating_display.short_description = 'Avg Rating'
+
+    def total_reviews(self, obj):
+        return obj.total_reviews()
+    total_reviews.short_description = 'Reviews Count'
+
+
+
