@@ -13,6 +13,11 @@ def validate_excel_file(file):
     if ext not in valid_extensions:
         raise ValidationError('Only Excel files (.xlsx or .xls) are allowed.')
 
+from django.db import models
+class ImportFile(models.Model):
+    file = models.FileField(upload_to='imports/', validators=[validate_excel_file])
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
 
 class Region(models.Model):
     name = models.CharField(max_length=100)

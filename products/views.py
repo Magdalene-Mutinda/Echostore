@@ -36,6 +36,19 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from .models import Address
 from .forms import AddressForm
+from django.shortcuts import render, redirect
+from .forms import ExcelUploadForm
+from .models import ImportFile
+
+def upload_excel(request):
+    if request.method == 'POST':
+        form = ExcelUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            ImportFile.objects.create(file=request.FILES['file'])
+            return redirect('success_page')
+    else:
+        form = ExcelUploadForm()
+    return render(request, 'upload_excel.html', {'form': form})
 
 
 @login_required

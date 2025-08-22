@@ -100,6 +100,16 @@ class CustomSignupForm(UserCreationForm):
         fields = ['username', 'first_name', 'last_name', 'email', 'phone', 'password1', 'password2']
 
 from django import forms
+from django.core.exceptions import ValidationError
+
+def validate_excel_file(file):
+    valid_extensions = ['xls', 'xlsx']
+    ext = file.name.split('.')[-1].lower()
+    if ext not in valid_extensions:
+        raise ValidationError("Only Excel files (.xls or .xlsx) are allowed.")
 
 class ExcelUploadForm(forms.Form):
-    file = forms.FileField(label="Select Excel File")
+    file = forms.FileField(
+        label="Select Excel File",
+        validators=[validate_excel_file]
+    )
